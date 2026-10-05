@@ -34,6 +34,10 @@ It gives a store the function Article 11a describes. It doesn't decide whether a
 - `zc_plugins/EuWithdrawalButton/v1.0.0/`: the plugin, exactly as it's uploaded.
 - `readme.html`: a copy of the plugin's readme at the top of the download.
 
+## Support
+
+Ask in the support thread on the Zen Cart forum: https://www.zen-cart.com/threads/207395. Bugs can also be reported in this repository's issue tracker.
+
 ## License
 
 GNU General Public License v2.0. Copyright (c) 2026 My Zen Cart Host (dbltoe).

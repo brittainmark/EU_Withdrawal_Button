@@ -19,7 +19,7 @@
 $euwPluginDir = 'zc_plugins/EuWithdrawalButton/v1.0.0/';
 $euwReadmeUrl = (defined('DIR_WS_CATALOG') ? DIR_WS_CATALOG : '/') . $euwPluginDir . 'readme.html';
 $euwGithubUrl = 'https://github.com/dbltoe/EU_Withdrawal_Button';
-$euwForumUrl = '';
+$euwForumUrl = 'https://www.zen-cart.com/threads/207395';
 
 $euwGap = '6px';
 $euwButton = static function ($url, $label) use ($euwGap) {
