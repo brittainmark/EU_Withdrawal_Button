@@ -9,6 +9,7 @@ Configuration > EU Withdrawal Button:
 | Selected Countries | EU 27, IS, LI, NO | Two-letter codes, comma-separated. |
 | Country Server Variable | HTTP_CF_IPCOUNTRY | The server variable with a guest's country (Cloudflare's header). Others: GEOIP_COUNTRY_CODE, MM_COUNTRY_CODE. |
 | Who the Page Is For (Optional) | blank | A line above the form. |
+| Withdrawal Link in Order E-Mail? | true | A "Withdraw From Contract Here" link in the order confirmation email, above the disclaimer. Follows Show Withdrawal Button To by the order's delivery (else billing) country. |
 | Store Time Zone | blank (PHP's) | The zone of the submission time in the acknowledgment, for example Europe/Madrid. |
 | Notify E-Mail Address | blank (store owner) | Who gets the store's notice. Several, comma-separated. |
 | Orders to List (Days) | 90 | A logged-in customer picks from their orders of the last this-many days. 1 to 3650. |

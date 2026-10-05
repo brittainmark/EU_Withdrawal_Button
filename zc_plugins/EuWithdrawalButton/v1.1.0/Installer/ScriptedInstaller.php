@@ -226,6 +226,14 @@ class ScriptedInstaller extends ScriptedInstallBase
                 'set_function' => '',
             ],
             [
+                'key' => 'EU_WITHDRAWAL_ORDER_EMAIL_LINK',
+                'title' => 'Withdrawal Link in Order E-Mail?',
+                'value' => 'true',
+                'description' => 'When true, the order confirmation email carries a "Withdraw From Contract Here" link to the withdrawal page, above the store\'s disclaimer. It follows Show Withdrawal Button To, by the order\'s delivery country (else billing).',
+                'sort_order' => 55,
+                'set_function' => $yesNo,
+            ],
+            [
                 'key' => 'EU_WITHDRAWAL_TIMEZONE',
                 'title' => 'Store Time Zone',
                 'value' => '',

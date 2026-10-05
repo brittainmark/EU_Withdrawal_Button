@@ -27,7 +27,7 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 <body>
 
 <h1>EU Withdrawal Button for Zen Cart</h1>
-<p class="lead">Version 1.0.0 for Zen Cart 1.5.8 through 3.0.0 on PHP 7.4 through 8.5. Free software (GPL v2) by My Zen Cart Host (dbltoe).</p>
+<p class="lead">Version 1.1.0 for Zen Cart 1.5.8 through 3.0.0 on PHP 7.4 through 8.5. Free software (GPL v2) by My Zen Cart Host (dbltoe).</p>
 
 <nav aria-label="Contents">
 <h2 id="contents">Contents</h2>
@@ -85,7 +85,7 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 
 <h2 id="installing">Installing</h2>
 <ol>
-<li>Upload the <code>zc_plugins/EuWithdrawalButton</code> folder from this package into your store's <code>zc_plugins</code> folder, so you have <code>zc_plugins/EuWithdrawalButton/v1.0.0/manifest.php</code>.</li>
+<li>Upload the <code>zc_plugins/EuWithdrawalButton</code> folder from this package into your store's <code>zc_plugins</code> folder, so you have <code>zc_plugins/EuWithdrawalButton/v1.1.0/manifest.php</code>.</li>
 <li>In the admin, open <strong>Modules &gt; Plugin Manager</strong>, select <strong>EU Withdrawal Button</strong> and click <strong>Install</strong>.</li>
 <li>Set <strong>Store Time Zone</strong> under <strong>Configuration &gt; EU Withdrawal Button</strong> (for example <code>Europe/Berlin</code>). Hosting servers often run on UTC.</li>
 <li>Look at your storefront: the button is in the footer. Try the page once with a real order of your own.</li>
@@ -101,6 +101,7 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 <tr><td>Selected Countries</td><td>EU 27, IS, LI, NO</td><td>Two-letter codes, comma-separated.</td></tr>
 <tr><td>Country Server Variable</td><td>HTTP_CF_IPCOUNTRY</td><td>Where a guest's country comes from (Cloudflare's header by default).</td></tr>
 <tr><td>Who the Page Is For (Optional)</td><td>blank</td><td>A line above the form, for example "For customers in the EU, Iceland, Liechtenstein and Norway."</td></tr>
+<tr><td>Withdrawal Link in Order E-Mail?</td><td>true</td><td>Adds a "Withdraw From Contract Here" link to the order confirmation email, above your disclaimer. It follows Show Withdrawal Button To, by the order's delivery country (else billing). See <a href="#emails">The emails</a>.</td></tr>
 <tr><td>Store Time Zone</td><td>blank (PHP's)</td><td>The time zone of the date and time in the acknowledgment.</td></tr>
 <tr><td>Notify E-Mail Address</td><td>blank (store owner)</td><td>Who gets the store's notice of each withdrawal. Several addresses, comma-separated.</td></tr>
 <tr><td>Orders to List (Days)</td><td>90</td><td>A logged-in customer chooses from their orders of the last this-many days.</td></tr>
@@ -147,6 +148,8 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 <h3>To the store: the notice</h3>
 <p>Sent to the Notify E-Mail Address (or the store owner) for every withdrawal. It says whether the statement matched an order, whether the acknowledgment went out, and what to do next. Reply-to is the customer, so you can answer straight from it.</p>
 <p>Both are in Tools &gt; Preview Email (with the free Preview Email plugin), under EU Withdrawal Button.</p>
+<h3>In the order confirmation email</h3>
+<p>Every order confirmation email carries a short line, "To withdraw from this order, use our withdrawal page:", with a <strong>Withdraw From Contract Here</strong> link to it, just above your store's disclaimer. It's where customers look first. The link uses the same label as the button, in the customer's language. Under <em>Selected Countries</em> it goes only to orders delivered (or, for downloads, billed) to those countries; when the country can't be told, it's included. Turn it off with <em>Withdrawal Link in Order E-Mail?</em>.</p>
 <h3>The spam trap</h3>
 <p>The form has a hidden field only robots fill in. A statement that fills it is still saved, but <strong>held</strong>: nothing is emailed to the address given and nothing is written to the order, so the form can't be used to send email to strangers. You're notified; if a held statement is genuine, open it and click <strong>Send Acknowledgment</strong>.</p>
 
@@ -190,10 +193,12 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 <li><strong>Wording:</strong> every word of the page and the emails is in <code>catalog/includes/languages/english/extra_definitions/lang.eu_withdrawal.php</code>. Copy a constant into your own override language file to change it.</li>
 <li><strong>The page:</strong> copy <code>tpl_eu_withdrawal_default.php</code> into your template's <code>templates</code> folder. Change its look freely; keep the Confirm Withdrawal button's words.</li>
 <li><strong>The emails' look:</strong> they use your store's email template, or Preview Email Pro if you have it.</li>
+<li><strong>Your own code:</strong> the page, the emails and the admin page fire notifiers (<code>NOTIFY_EU_WITHDRAWAL_*</code>) that an observer can attach to; EU Withdrawal Button Pro is built on them. They're listed in <code>docs/CUSTOMIZING.md</code> in the download. A copy of the page's template made before version 1.1.0 lacks the template's ones; copy the new lines over.</li>
 </ul>
 
 <h2 id="upgrading">Upgrading</h2>
-<p>Upload the new version's folder beside the old one and click <strong>Upgrade</strong> in Plugin Manager. Your settings and every withdrawal statement are kept.</p>
+<p>Upload the new version's folder beside the old one and click <strong>Upgrade</strong> in Plugin Manager. Your settings and every withdrawal statement are kept. Then <strong>Clean Up</strong> removes the old version's folder.</p>
+<p>From 1.0.0 to 1.1.0, one setting is new: <em>Withdrawal Link in Order E-Mail?</em>, which arrives switched on.</p>
 
 <h2 id="uninstalling">Uninstalling</h2>
 <p>Click <strong>Uninstall</strong> in Plugin Manager. With <em>Delete Withdrawal Records on Uninstall?</em> false (the default) every statement is kept, and a later install picks them up again. Remember the law still applies to your store without the button.</p>

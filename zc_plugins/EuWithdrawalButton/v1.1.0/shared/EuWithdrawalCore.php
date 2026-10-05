@@ -27,7 +27,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 
 class EuWithdrawalCore
 {
-    public const VERSION = 'v1.0.0';
+    public const VERSION = 'v1.1.0';
 
     /** zen_mail() module names: our own, so the email hooks touch only our mail. */
     public const MAIL_ACK = 'eu_withdrawal_ack';
@@ -98,6 +98,20 @@ class EuWithdrawalCore
     public static function fresh($db, string $sql)
     {
         return $db->Execute($sql, null, false, 0, true);
+    }
+
+    /**
+     * Fire one of the plugin's own notifiers: the seams EU Withdrawal Button
+     * Pro (or a store's own observer) attaches to. They're listed in
+     * docs/CUSTOMIZING.md. Nothing listens unless something is installed, and
+     * nothing here changes when nothing does.
+     */
+    public static function notify(string $eventID, $data = [], &$p2 = null, &$p3 = null, &$p4 = null): void
+    {
+        global $zco_notifier;
+        if (isset($zco_notifier) && is_object($zco_notifier)) {
+            $zco_notifier->notify($eventID, $data, $p2, $p3, $p4);
+        }
     }
 
     /* ----------------------------------------------------------------- *
@@ -311,6 +325,30 @@ class EuWithdrawalCore
         return trim((string)($s['order_entered'] ?? ''));
     }
 
+    /**
+     * What's withdrawn, as it's saved: the lines an add-on listed (Pro's item
+     * picker passes them through NOTIFY_EU_WITHDRAWAL_FORM_READ), then what
+     * the customer typed. Both are part of the statement, so both go into the
+     * acknowledgment. '' means the whole order.
+     *
+     * @param mixed $lines the add-on's 'items_lines', if any
+     */
+    public static function combineItems($lines, string $typed): string
+    {
+        $out = [];
+        foreach (is_array($lines) ? $lines : [] as $line) {
+            $line = trim(is_scalar($line) ? (string)$line : '');
+            if ($line !== '') {
+                $out[] = self::cut($line, 255);
+            }
+        }
+        $typed = trim($typed);
+        if ($typed !== '') {
+            $out[] = $typed;
+        }
+        return self::cut(implode("\n", $out), 6000);
+    }
+
     /** What's withdrawn: the customer's list, or "The whole order". */
     public static function itemsText(array $s): string
     {
@@ -427,6 +465,51 @@ class EuWithdrawalCore
         }
         $html .= '</table>';
         return ['subject' => $subject, 'text' => $text, 'html' => $html];
+    }
+
+    /* ----------------------------------------------------------------- *
+     * The order confirmation email
+     * ----------------------------------------------------------------- */
+
+    /**
+     * Whether the order confirmation email gets the withdrawal link: the same
+     * rule as the button, by the order's delivery country, else its billing
+     * country (a virtual order has no delivery). Unknown shows it.
+     */
+    public static function orderEmailShows(string $mode, array $countries, string $deliveryIso, string $billingIso): bool
+    {
+        $country = strtoupper(trim($deliveryIso)) !== '' ? strtoupper(trim($deliveryIso)) : strtoupper(trim($billingIso));
+        return self::buttonShows($mode, $countries, preg_match('/^[A-Z]{2}$/', $country) === 1 ? $country : '');
+    }
+
+    /**
+     * The link for the order confirmation email. $href is core's
+     * zen_href_link() result, which is already HTML-ready (& as &amp;): the
+     * HTML part prints it as it comes, the text part gets the plain URL.
+     *
+     * @return array{text:string, html:string}
+     */
+    public static function orderEmailLink(string $href, string $label): array
+    {
+        $intro = self::text('EU_WITHDRAWAL_ORDER_EMAIL_INTRO');
+        return [
+            'text' => $intro . "\n" . $label . ': ' . str_replace('&amp;', '&', $href),
+            'html' => '<p>' . self::esc($intro) . ' <a href="' . $href . '">' . self::esc($label) . '</a></p>',
+        ];
+    }
+
+    /**
+     * The text part with the link added before core's disclaimer and
+     * copyright lines (each starts "\n-----\n"; the order's own separators are
+     * longer), or at the end when the store has neither.
+     */
+    public static function insertBeforeFooter(string $email, string $add): string
+    {
+        $at = strpos($email, "\n-----\n");
+        if ($at === false) {
+            return rtrim($email, "\n") . "\n\n" . $add . "\n";
+        }
+        return substr($email, 0, $at) . "\n" . $add . "\n" . substr($email, $at);
     }
 
     /**

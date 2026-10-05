@@ -84,6 +84,10 @@ $define = [
     'EU_WITHDRAWAL_CUSTOMER_NOTE' => 'Withdrawal received on %s.',
     'EU_WITHDRAWAL_UPDATED_BY' => 'EU Withdrawal Button',
 
+    // The order confirmation email (Withdrawal Link in Order Email?), above the
+    // link labeled with the legal label.
+    'EU_WITHDRAWAL_ORDER_EMAIL_INTRO' => 'To withdraw from this order, use our withdrawal page:',
+
     // Recorded on the statement when zen_mail() sent nothing (shown in the admin).
     'EU_WITHDRAWAL_MAIL_NOT_SENT' => 'Not sent: Send E-Mails is off, this email type is in EMAIL_MODULES_TO_SKIP, or the name or address held a line break.',
 ];

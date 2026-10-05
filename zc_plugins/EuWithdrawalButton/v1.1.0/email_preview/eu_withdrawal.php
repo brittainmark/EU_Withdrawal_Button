@@ -4,8 +4,8 @@
  *
  * Preview Email (Tools > Preview Email) reads every installed plugin's
  * <version>/email_preview/*.php. Each entry builds its email with the same
- * compose method the plugin sends it with -- only the data is sample data --
- * so what the store owner previews is the real email.
+ * method the plugin sends it with (add-ons' additions included) -- only the
+ * data is sample data -- so what the store owner previews is the real email.
  *
  * Every zen_mail() call in this plugin is marked "Preview Email: <key>" and a
  * harness checks that each key is defined here.
@@ -22,6 +22,9 @@ if (!defined('IS_ADMIN_FLAG')) {
 // loaded this class from the other version folder ("Cannot redeclare class").
 if (!class_exists('EuWithdrawalCore', false)) {
     require_once dirname(__DIR__) . '/shared/EuWithdrawalCore.php';
+}
+if (!class_exists('EuWithdrawalMailer', false)) {
+    require_once dirname(__DIR__) . '/shared/EuWithdrawalMailer.php';
 }
 
 if (!function_exists('eu_withdrawal_preview_statement')) {
@@ -70,7 +73,7 @@ return [
         'page_base' => 'eu_withdrawal',
         'build' => static function (array $def): array {
             $s = eu_withdrawal_preview_statement(true);
-            $m = EuWithdrawalCore::composeAcknowledgment($s);
+            $m = EuWithdrawalMailer::acknowledgment($s);
             return [
                 'subject' => $m['subject'],
                 'text' => $m['text'],
@@ -91,7 +94,7 @@ return [
         'page_base' => 'eu_withdrawal',
         'build' => static function (array $def): array {
             $s = eu_withdrawal_preview_statement(true);
-            $m = EuWithdrawalCore::composeStoreNotice($s);
+            $m = EuWithdrawalMailer::notice($s);
             return [
                 'subject' => $m['subject'],
                 'text' => $m['text'],

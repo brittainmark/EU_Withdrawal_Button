@@ -6,6 +6,9 @@
  * templates/ folder to change it. The Confirm Withdrawal button's words are
  * fixed by law (Article 11a(3)): change its look, not its label.
  *
+ * A copy made before v1.1.0 lacks the NOTIFY_EU_WITHDRAWAL_TPL_* points below,
+ * where an add-on (EU Withdrawal Button Pro) draws its fields; copy them over.
+ *
  * Contrast: white on #0b3d91 is 10.04:1, on the #072a66 hover 13.71:1, and
  * #0b3d91 on white is 10.04:1 (all AAA). Hover deepens the shadow only.
  *
@@ -16,6 +19,8 @@ $euwE = static function ($s): string {
     return EuWithdrawalCore::esc((string)$s);
 };
 $euwAudience = trim(EuWithdrawalCore::setting('EU_WITHDRAWAL_AUDIENCE_NOTE', ''));
+$euwExtra = isset($euwExtra) && is_array($euwExtra) ? $euwExtra : [];
+$euwItemsShown = EuWithdrawalCore::combineItems($euwExtra['items_lines'] ?? [], (string)$euwForm['items']);
 ?>
 <style>
 #euWithdrawal .euw-field{margin:0 0 14px}
@@ -40,14 +45,16 @@ $euwAudience = trim(EuWithdrawalCore::setting('EU_WITHDRAWAL_AUDIENCE_NOTE', '')
 <?php if ($euwView === 'done' && is_array($euwDone)) { ?>
     <p><strong><?= $euwE(sprintf(EuWithdrawalCore::text('EU_WITHDRAWAL_DONE'), EuWithdrawalCore::reference((int)$euwDone['eu_withdrawals_id']), $euwDone['created_local'])) ?></strong></p>
     <p><?= $euwE(sprintf(EuWithdrawalCore::text($euwDone['status'] === 'held' ? 'EU_WITHDRAWAL_DONE_HELD' : 'EU_WITHDRAWAL_DONE_EMAILED'), $euwDone['email'])) ?></p>
+<?php EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_TPL_DONE', ['withdrawal' => $euwDone]); ?>
 
 <?php } elseif ($euwView === 'review') { ?>
     <p><?= $euwE(sprintf(EuWithdrawalCore::text('EU_WITHDRAWAL_REVIEW_INTRO'), $euwConfirmLabel)) ?></p>
     <table class="euw-review">
         <tr><th scope="row"><?= $euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_FIELD_NAME')) ?></th><td><?= $euwE($euwForm['name']) ?></td></tr>
         <tr><th scope="row"><?= $euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_FIELD_ORDER')) ?></th><td><?= $euwForm['orders_id'] > 0 ? '#' . (int)$euwForm['orders_id'] : $euwE($euwForm['order']) ?></td></tr>
-        <tr><th scope="row"><?= $euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_FIELD_ITEMS')) ?></th><td><?= $euwForm['items'] !== '' ? nl2br($euwE($euwForm['items'])) : $euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_WHOLE_ORDER')) ?></td></tr>
+        <tr><th scope="row"><?= $euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_FIELD_ITEMS')) ?></th><td><?= $euwItemsShown !== '' ? nl2br($euwE($euwItemsShown)) : $euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_WHOLE_ORDER')) ?></td></tr>
         <tr><th scope="row"><?= $euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_FIELD_EMAIL')) ?></th><td><?= $euwE($euwForm['email']) ?></td></tr>
+<?php EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_TPL_REVIEW_ROWS', ['form' => $euwForm, 'extra' => $euwExtra]); ?>
     </table>
     <p class="euw-note"><?= sprintf($euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_PRIVACY')), '<a href="' . zen_href_link(FILENAME_PRIVACY, '', 'SSL') . '">' . $euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_PRIVACY_LINK')) . '</a>') ?></p>
     <?= zen_draw_form('eu_withdrawal_confirm', $euwFormAction, 'post') ?>
@@ -61,6 +68,7 @@ $euwAudience = trim(EuWithdrawalCore::setting('EU_WITHDRAWAL_AUDIENCE_NOTE', '')
         <?= zen_draw_hidden_field('euw_order', $euwForm['order']) ?>
         <?= zen_draw_hidden_field('euw_orders_id', (string)$euwForm['orders_id']) ?>
         <?= zen_draw_hidden_field('euw_items', $euwForm['items']) ?>
+<?php EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_TPL_CHANGE_FIELDS', ['form' => $euwForm, 'extra' => $euwExtra]); ?>
         <p><button type="submit" class="euw-secondary"><?= $euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_BUTTON_CHANGE')) ?></button></p>
     </form>
 
@@ -99,6 +107,7 @@ $euwAudience = trim(EuWithdrawalCore::setting('EU_WITHDRAWAL_AUDIENCE_NOTE', '')
             <label for="euw-email"><?= $euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_INPUT_EMAIL')) ?></label>
             <input type="email" id="euw-email" name="euw_email" value="<?= $euwE($euwForm['email']) ?>" maxlength="96" autocomplete="email" required>
         </div>
+<?php EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_TPL_FORM_FIELDS', ['form' => $euwForm, 'orders' => $euwOrders, 'extra' => $euwExtra]); ?>
         <div class="euw-field">
             <label for="euw-items"><?= $euwE(EuWithdrawalCore::text('EU_WITHDRAWAL_INPUT_ITEMS')) ?></label>
             <textarea id="euw-items" name="euw_items" rows="3" maxlength="2000"><?= $euwE($euwForm['items']) ?></textarea>

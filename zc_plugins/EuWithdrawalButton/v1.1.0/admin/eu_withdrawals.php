@@ -12,6 +12,14 @@
  *
  * Declares no functions: the work is in the shared classes.
  *
+ * Seams for an add-on (EU Withdrawal Button Pro), listed in docs/CUSTOMIZING.md:
+ *   NOTIFY_EU_WITHDRAWAL_ADMIN_POST         a POST whose action isn't one of ours
+ *   NOTIFY_EU_WITHDRAWAL_ADMIN_HEAD         inside <head>
+ *   NOTIFY_EU_WITHDRAWAL_ADMIN_LIST_HEAD    a column heading on the list
+ *   NOTIFY_EU_WITHDRAWAL_ADMIN_LIST_ROW     that column's cell, per withdrawal
+ *   NOTIFY_EU_WITHDRAWAL_ADMIN_DETAIL       under one withdrawal's actions
+ * An add-on registers its own fields with the admin request sanitizer.
+ *
  * @package  EuWithdrawalButton
  * @license  GNU General Public License v2.0 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  */
@@ -52,7 +60,7 @@ $euwAckText = static function (array $row): string {
     return sprintf(EU_WITHDRAWAL_ADMIN_ACK_FAILED, $row['ack_error'] !== '' ? $row['ack_error'] : '-');
 };
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['action'] ?? ''), ['status', 'note', 'send_ack'], true)) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string)($_POST['action'] ?? '') !== '') {
     $euwPostId = (int)($_POST['wID'] ?? 0);
     $euwRow = $euwStore->find($euwPostId);
     if ($euwRow === null) {
@@ -60,7 +68,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['action'] ?? ''), 
         zen_redirect(zen_href_link(FILENAME_EU_WITHDRAWALS, '', 'SSL'));
     }
     $euwPostAction = (string)$_POST['action'];
-    if ($euwPostAction === 'status') {
+    if (!in_array($euwPostAction, ['status', 'note', 'send_ack'], true)) {
+        // Not ours: an add-on's form on this page. It says what happened in the
+        // message stack; nothing is done here.
+        EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_ADMIN_POST', ['action' => $euwPostAction, 'withdrawal' => $euwRow]);
+    } elseif ($euwPostAction === 'status') {
         if ($euwStore->setStatus($euwPostId, (string)($_POST['status'] ?? ''))) {
             $messageStack->add_session(EU_WITHDRAWAL_ADMIN_MSG_STATUS, 'success');
         } else {
@@ -130,6 +142,7 @@ $euwOrderLink = static function (array $row) use ($euwH): string {
 .euw-admin .euw-actions form{min-width:260px}
 .euw-admin textarea{width:100%;max-width:40em}
 </style>
+<?php EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_ADMIN_HEAD', ['withdrawal' => $euwRow]); ?>
 </head>
 <body>
 <?php require DIR_WS_INCLUDES . 'header.php'; ?>
@@ -172,6 +185,7 @@ $euwOrderLink = static function (array $row) use ($euwH): string {
       <th scope="col"><?= $euwH(EU_WITHDRAWAL_ADMIN_COL_ITEMS) ?></th>
       <th scope="col"><?= $euwH(EU_WITHDRAWAL_ADMIN_COL_STATUS) ?></th>
       <th scope="col"><?= $euwH(EU_WITHDRAWAL_ADMIN_COL_ACK) ?></th>
+<?php EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_ADMIN_LIST_HEAD'); ?>
       <th scope="col"><span class="sr-only"><?= $euwH(EU_WITHDRAWAL_ADMIN_BUTTON_DETAILS) ?></span></th>
     </tr></thead>
     <tbody>
@@ -186,6 +200,7 @@ $euwOrderLink = static function (array $row) use ($euwH): string {
         <td><?= $euwH(EuWithdrawalCore::itemsText($euwItem)) ?></td>
         <td><?= $euwH($euwStatusLabel((string)$euwItem['status'])) ?></td>
         <td><?= $euwH($euwAckText($euwItem)) ?></td>
+<?php EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_ADMIN_LIST_ROW', ['withdrawal' => $euwItem]); ?>
         <td><a class="btn btn-default btn-xs" href="<?= zen_href_link(FILENAME_EU_WITHDRAWALS, 'wID=' . (int)$euwItem['eu_withdrawals_id'], 'SSL') ?>" aria-label="<?= $euwH(EU_WITHDRAWAL_ADMIN_BUTTON_DETAILS . ' ' . $euwItemRef) ?>"><?= $euwH(EU_WITHDRAWAL_ADMIN_BUTTON_DETAILS) ?></a></td>
       </tr>
 <?php } ?>
@@ -275,6 +290,7 @@ $euwOrderLink = static function (array $row) use ($euwH): string {
       <p><button type="submit" class="btn btn-default"><?= $euwH(EU_WITHDRAWAL_ADMIN_BUTTON_SAVE_NOTE) ?></button></p>
     </form>
   </div>
+<?php EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_ADMIN_DETAIL', ['withdrawal' => $euwRow]); ?>
 <?php } ?>
 </div>
 <?php require DIR_WS_INCLUDES . 'footer.php'; ?>

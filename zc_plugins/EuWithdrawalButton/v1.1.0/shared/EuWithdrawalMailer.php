@@ -25,10 +25,47 @@ if (!class_exists('EuWithdrawalCore', false)) {
 
 class EuWithdrawalMailer
 {
+    /**
+     * The acknowledgment as it's sent: composed, then NOTIFY_EU_WITHDRAWAL_COMPOSE_ACK
+     * ($s, then the subject/text/html by reference) so an add-on can add to it.
+     * Preview Email builds it here too, so the preview is what goes out.
+     *
+     * @return array{subject:string, text:string, html:string}
+     */
+    public static function acknowledgment(array $s): array
+    {
+        $m = EuWithdrawalCore::composeAcknowledgment($s);
+        EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_COMPOSE_ACK', $s, $m);
+        return self::shaped($m);
+    }
+
+    /**
+     * The store's notice as it's sent, through NOTIFY_EU_WITHDRAWAL_COMPOSE_NOTICE.
+     *
+     * @return array{subject:string, text:string, html:string}
+     */
+    public static function notice(array $s): array
+    {
+        $m = EuWithdrawalCore::composeStoreNotice($s);
+        EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_COMPOSE_NOTICE', $s, $m);
+        return self::shaped($m);
+    }
+
+    /** Whatever an observer did to it, the three parts are strings. */
+    protected static function shaped($m): array
+    {
+        $m = is_array($m) ? $m : [];
+        return [
+            'subject' => (string)($m['subject'] ?? ''),
+            'text' => (string)($m['text'] ?? ''),
+            'html' => (string)($m['html'] ?? ''),
+        ];
+    }
+
     /** The customer's acknowledgment of receipt. Returns '' or the error. */
     public static function sendAcknowledgment(array $s): string
     {
-        $m = EuWithdrawalCore::composeAcknowledgment($s);
+        $m = self::acknowledgment($s);
         // Preview Email: eu_withdrawal_ack
         $result = zen_mail(
             (string)$s['name'],
@@ -63,7 +100,7 @@ class EuWithdrawalMailer
      */
     public static function sendStoreNotice(array $s): string
     {
-        $m = EuWithdrawalCore::composeStoreNotice($s);
+        $m = self::notice($s);
         $errors = [];
         foreach (self::noticeRecipients() as $to) {
             // Preview Email: eu_withdrawal_notice

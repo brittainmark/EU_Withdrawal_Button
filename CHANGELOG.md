@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0] - 2026-10-05
+
+- The order confirmation email carries a "Withdraw From Contract Here" link to the withdrawal page, above the store's disclaimer (through `NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND`, same arguments 1.5.8 to 3.0.0). New setting Withdrawal Link in Order E-Mail?, on by default; under Selected Countries it follows the order's delivery (else billing) country, and an unknown country gets the link.
+- Notifiers for add-ons (EU Withdrawal Button Pro) and stores' own observers, listed in `docs/CUSTOMIZING.md`: the page (`FORM_READ`, `SAVED`), each email's compose step, four template points and five on the admin page. With nothing listening the plugin works exactly as 1.0.0 did. An add-on's item lines become part of the statement, so the acknowledgment carries them.
+- Preview Email builds both emails through the same method that sends them, so an add-on's additions show in the preview.
+- A copy of `tpl_eu_withdrawal_default.php` made before 1.1.0 keeps working but lacks the template notifiers.
+
 ## [1.0.0] - 2026-10-05
 
 First release.
@@ -15,4 +22,5 @@ First release.
 - The two legal labels, verbatim from the directive, for English, Dutch, Finnish, French, German, Italian and Spanish, chosen by language code. Other text falls back to English for a store language with no translation.
 - Preview Email definitions for both emails.
 
+[1.1.0]: https://github.com/dbltoe/EU_Withdrawal_Button/releases/tag/v1.1.0
 [1.0.0]: https://github.com/dbltoe/EU_Withdrawal_Button/releases/tag/v1.0.0

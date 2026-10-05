@@ -20,6 +20,12 @@
  * And NOTIFY_EMAIL_DETERMINING_EMAIL_FORMAT: a guest's acknowledgment goes as
  * HTML (core sends a non-customer text-only).
  *
+ * And NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND (order.php, same arguments
+ * 1.5.8 -> 3.0.0): the order confirmation email gets the withdrawal link
+ * (Withdrawal Link in Order Email?), by the order's country under the same
+ * rule as the button. Text part before core's disclaimer, HTML part in the
+ * template's $EMAIL_ORDER_MESSAGE slot.
+ *
  * @package  EuWithdrawalButton
  * @license  GNU General Public License v2.0 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  */
@@ -45,6 +51,7 @@ class zcObserverEuWithdrawal extends base
             'NOTIFY_FOOTER_AFTER_NAVSUPP',
             'NOTIFY_FOOTER_END',
             'NOTIFY_EMAIL_DETERMINING_EMAIL_FORMAT',
+            'NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND',
         ]);
     }
 
@@ -56,6 +63,39 @@ class zcObserverEuWithdrawal extends base
             $this->render('end');
         } elseif ($eventID === 'NOTIFY_EMAIL_DETERMINING_EMAIL_FORMAT') {
             EuWithdrawalCore::mailFormat($p2, $p3);
+        } elseif ($eventID === 'NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND') {
+            $this->addOrderEmailLink($class, is_array($p1) ? (int)($p1['zf_insert_id'] ?? 0) : 0, $p2, $p3);
+        }
+    }
+
+    /**
+     * The withdrawal link in the order confirmation email.
+     *
+     * @param mixed $order    the order object
+     * @param mixed $text     the text email, by reference
+     * @param mixed $htmlMsg  the HTML template's fields, by reference
+     */
+    public function addOrderEmailLink($order, int $orderId, &$text, &$htmlMsg): void
+    {
+        if (!EuWithdrawalCore::enabled() || !EuWithdrawalCore::settingOn('EU_WITHDRAWAL_ORDER_EMAIL_LINK', true)
+            || !defined('FILENAME_EU_WITHDRAWAL') || $orderId <= 0 || !is_string($text)) {
+            return;
+        }
+        $mode = EuWithdrawalCore::setting('EU_WITHDRAWAL_SHOW_TO', EuWithdrawalCore::SHOW_ALL);
+        $countries = EuWithdrawalCore::parseCountries(EuWithdrawalCore::setting('EU_WITHDRAWAL_COUNTRIES', EuWithdrawalCore::COUNTRIES_DEFAULT));
+        $iso = static function ($address): string {
+            return is_array($address) && is_array($address['country'] ?? null) ? (string)($address['country']['iso_code_2'] ?? '') : '';
+        };
+        if (!EuWithdrawalCore::orderEmailShows($mode, $countries, $iso($order->delivery ?? null), $iso($order->billing ?? null))) {
+            return;
+        }
+        $link = EuWithdrawalCore::orderEmailLink(
+            zen_href_link(FILENAME_EU_WITHDRAWAL, 'order_id=' . $orderId, 'SSL', false),
+            EuWithdrawalCore::label('link', (string)($_SESSION['languages_code'] ?? 'en'))
+        );
+        $text = EuWithdrawalCore::insertBeforeFooter($text, $link['text']);
+        if (is_array($htmlMsg)) {
+            $htmlMsg['EMAIL_ORDER_MESSAGE'] = (string)($htmlMsg['EMAIL_ORDER_MESSAGE'] ?? '') . $link['html'];
         }
     }
 

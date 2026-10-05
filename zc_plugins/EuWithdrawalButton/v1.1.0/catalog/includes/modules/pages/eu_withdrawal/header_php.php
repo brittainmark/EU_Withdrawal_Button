@@ -17,6 +17,13 @@
  * order are saved as "not matched" for the store to sort out, and the spam trap
  * holds a statement for staff instead of throwing it away.
  *
+ * Seams for an add-on (EU Withdrawal Button Pro), listed in docs/CUSTOMIZING.md:
+ *   NOTIFY_EU_WITHDRAWAL_FORM_READ  review/change: the add-on reads its own fields
+ *                                   into $euwExtra (kept with the pending statement);
+ *                                   its 'items_lines' become part of the statement
+ *   NOTIFY_EU_WITHDRAWAL_SAVED      the statement is saved, nothing sent yet
+ * and the template's NOTIFY_EU_WITHDRAWAL_TPL_* points.
+ *
  * @package  EuWithdrawalButton
  * @license  GNU General Public License v2.0 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  */
@@ -47,6 +54,8 @@ $euwErrors = [];
 $euwForm = ['name' => '', 'email' => '', 'order' => '', 'orders_id' => 0, 'items' => ''];
 $euwOrders = [];
 $euwDone = null;
+// An add-on's own data for this statement (Pro's item picker); free leaves it empty.
+$euwExtra = [];
 
 // A logged-in customer: pre-filled, and their recent orders to pick from (Recital 37).
 if ($euwCustomerId > 0) {
@@ -70,6 +79,15 @@ if ($euwAction === 'review' || $euwAction === 'change') {
     $euwPick = (int)($_POST['euw_orders_id'] ?? 0);
     $euwForm['orders_id'] = isset($euwOrders[$euwPick]) ? $euwPick : 0;
 
+    EuWithdrawalCore::notify(
+        'NOTIFY_EU_WITHDRAWAL_FORM_READ',
+        ['action' => $euwAction, 'form' => $euwForm, 'orders' => $euwOrders, 'customers_id' => $euwCustomerId],
+        $euwExtra,
+        $euwErrors
+    );
+    $euwExtra = is_array($euwExtra) ? $euwExtra : [];
+    $euwErrors = is_array($euwErrors) ? array_values(array_filter($euwErrors, 'is_string')) : [];
+
     if ($euwAction === 'review') {
         if ($euwForm['name'] === '') {
             $euwErrors[] = EuWithdrawalCore::text('EU_WITHDRAWAL_ERR_NAME');
@@ -86,6 +104,7 @@ if ($euwAction === 'review' || $euwAction === 'change') {
             $_SESSION['eu_withdrawal_pending'] = $euwForm + [
                 // The spam trap: core's per-session field name, or the classic one.
                 'held' => (trim((string)($_POST[$euwAntiSpamField] ?? '')) !== '' || trim((string)($_POST['should_be_empty'] ?? '')) !== '') ? 1 : 0,
+                'extra' => $euwExtra,
             ];
         }
     }
@@ -97,6 +116,7 @@ if ($euwAction === 'confirm') {
     if (!is_array($euwPending)) {
         $euwErrors[] = EuWithdrawalCore::text('EU_WITHDRAWAL_ERR_EXPIRED');
     } else {
+        $euwExtra = is_array($euwPending['extra'] ?? null) ? $euwPending['extra'] : [];
         $euwOrderId = (int)$euwPending['orders_id'] > 0
             ? (int)$euwPending['orders_id']
             : $euwStore->matchOrder((string)$euwPending['order'], (string)$euwPending['email'], $euwCustomerId);
@@ -112,7 +132,7 @@ if ($euwAction === 'confirm') {
             'email' => (string)$euwPending['email'],
             'order_entered' => (string)$euwPending['order'] !== '' ? (string)$euwPending['order'] : '#' . (int)$euwPending['orders_id'],
             'orders_id' => $euwOrderId,
-            'items_text' => (string)$euwPending['items'],
+            'items_text' => EuWithdrawalCore::combineItems($euwExtra['items_lines'] ?? [], (string)$euwPending['items']),
             'language' => (string)($_SESSION['language'] ?? ''),
             'ip' => (string)($_SERVER['REMOTE_ADDR'] ?? ''),
             'country' => $euwCountry[0],
@@ -125,6 +145,7 @@ if ($euwAction === 'confirm') {
             $euwForm = array_merge($euwForm, array_intersect_key($euwPending, $euwForm));
         } else {
             $euwId = (int)$euwSaved['eu_withdrawals_id'];
+            EuWithdrawalCore::notify('NOTIFY_EU_WITHDRAWAL_SAVED', ['withdrawal' => $euwSaved, 'extra' => $euwExtra]);
             if ($euwSaved['status'] !== 'held') {
                 $euwStore->noteOrder($euwSaved);
                 $euwStore->markAcknowledged($euwId, EuWithdrawalMailer::sendAcknowledgment($euwSaved));

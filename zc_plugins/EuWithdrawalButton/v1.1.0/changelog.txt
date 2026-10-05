@@ -1,6 +1,17 @@
 EU Withdrawal Button -- changelog
 =================================
 
+v1.1.0
+------
+- The order confirmation email carries a "Withdraw From Contract
+  Here" link to the withdrawal page, above your disclaimer. New
+  setting: Withdrawal Link in Order E-Mail? (on). With Selected
+  Countries it follows the order's delivery (else billing) country.
+- Notifiers for add-ons such as EU Withdrawal Button Pro, listed in
+  docs/CUSTOMIZING.md. Nothing changes when nothing listens.
+- If you copied tpl_eu_withdrawal_default.php into your template,
+  copy the new NOTIFY_EU_WITHDRAWAL_TPL_* lines into your copy.
+
 v1.0.0
 ------
 The first release.

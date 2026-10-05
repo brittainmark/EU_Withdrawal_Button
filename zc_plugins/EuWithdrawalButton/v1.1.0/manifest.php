@@ -16,7 +16,7 @@
  * @license  GNU General Public License v2.0 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  */
 
-$euwPluginDir = 'zc_plugins/EuWithdrawalButton/v1.0.0/';
+$euwPluginDir = 'zc_plugins/EuWithdrawalButton/v1.1.0/';
 $euwReadmeUrl = (defined('DIR_WS_CATALOG') ? DIR_WS_CATALOG : '/') . $euwPluginDir . 'readme.html';
 $euwGithubUrl = 'https://github.com/dbltoe/EU_Withdrawal_Button';
 $euwForumUrl = 'https://www.zen-cart.com/threads/207395';
@@ -33,7 +33,7 @@ $euwLinks = '<div style="margin:10px 0 0;padding:0 0 0 ' . $euwGap . '">'
     . '</div>';
 
 return [
-    'pluginVersion' => 'v1.0.0',
+    'pluginVersion' => 'v1.1.0',
     'pluginName' => 'EU Withdrawal Button',
     'pluginDescription' =>
         'The withdrawal function EU law requires of online stores from 19 June 2026 (Article 11a, Directive (EU) 2023/2673): '
