@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.1] - 2026-10-06
+
+- Documentation only: EU Withdrawal Button Pro is out, so the readme's Pro section and README.md now say what it does and where to get it instead of calling it planned. No code or setting changes.
+
 ## [1.1.0] - 2026-10-05
 
 - The order confirmation email carries a "Withdraw From Contract Here" link to the withdrawal page, above the store's disclaimer (through `NOTIFY_ORDER_INVOICE_CONTENT_READY_TO_SEND`, same arguments 1.5.8 to 3.0.0). New setting Withdrawal Link in Order E-Mail?, on by default; under Selected Countries it follows the order's delivery (else billing) country, and an unknown country gets the link.
@@ -22,5 +26,6 @@ First release.
 - The two legal labels, verbatim from the directive, for English, Dutch, Finnish, French, German, Italian and Spanish, chosen by language code. Other text falls back to English for a store language with no translation.
 - Preview Email definitions for both emails.
 
+[1.1.1]: https://github.com/dbltoe/EU_Withdrawal_Button/releases/tag/v1.1.1
 [1.1.0]: https://github.com/dbltoe/EU_Withdrawal_Button/releases/tag/v1.1.0
 [1.0.0]: https://github.com/dbltoe/EU_Withdrawal_Button/releases/tag/v1.0.0

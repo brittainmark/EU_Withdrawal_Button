@@ -27,7 +27,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 
 class EuWithdrawalCore
 {
-    public const VERSION = 'v1.1.0';
+    public const VERSION = 'v1.1.1';
 
     /** zen_mail() module names: our own, so the email hooks touch only our mail. */
     public const MAIL_ACK = 'eu_withdrawal_ack';

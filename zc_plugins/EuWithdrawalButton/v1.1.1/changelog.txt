@@ -1,6 +1,12 @@
 EU Withdrawal Button -- changelog
 =================================
 
+v1.1.1
+------
+- Documentation only: EU Withdrawal Button Pro is out, so the
+  readme's Pro section says what it does and where to get it. No code
+  or setting changes.
+
 v1.1.0
 ------
 - The order confirmation email carries a "Withdraw From Contract

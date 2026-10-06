@@ -18,7 +18,7 @@ Runs on Zen Cart 1.5.8 through 3.0.0 and PHP 7.4 through 8.5 from one codebase, 
 
 It gives a store the function Article 11a describes. It doesn't decide whether a withdrawal is valid, and it isn't legal advice.
 
-**EU Withdrawal Button Pro** (planned, sold separately) will turn withdrawals into a returns portal: item-level returns, RMA numbers, return labels and status emails.
+**EU Withdrawal Button Pro** (sold separately at https://myzencartzone.com/index.php?main_page=product_info&products_id=41) turns withdrawals into a returns portal: items chosen by the customer, RMA numbers and return labels, refunds and store credit recorded, a Track Your Return page, the EU model withdrawal form in order emails, and an optional returns portal for customers outside the EU.
 
 ## Documentation
 
@@ -31,7 +31,7 @@ It gives a store the function Article 11a describes. It doesn't decide whether a
 
 ## Layout
 
-- `zc_plugins/EuWithdrawalButton/v1.1.0/`: the plugin, exactly as it's uploaded.
+- `zc_plugins/EuWithdrawalButton/v1.1.1/`: the plugin, exactly as it's uploaded.
 - `readme.html`: a copy of the plugin's readme at the top of the download.
 
 ## Support

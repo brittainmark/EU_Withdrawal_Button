@@ -27,7 +27,7 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 <body>
 
 <h1>EU Withdrawal Button for Zen Cart</h1>
-<p class="lead">Version 1.1.0 for Zen Cart 1.5.8 through 3.0.0 on PHP 7.4 through 8.5. Free software (GPL v2) by My Zen Cart Host (dbltoe).</p>
+<p class="lead">Version 1.1.1 for Zen Cart 1.5.8 through 3.0.0 on PHP 7.4 through 8.5. Free software (GPL v2) by My Zen Cart Host (dbltoe).</p>
 
 <nav aria-label="Contents">
 <h2 id="contents">Contents</h2>
@@ -85,7 +85,7 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 
 <h2 id="installing">Installing</h2>
 <ol>
-<li>Upload the <code>zc_plugins/EuWithdrawalButton</code> folder from this package into your store's <code>zc_plugins</code> folder, so you have <code>zc_plugins/EuWithdrawalButton/v1.1.0/manifest.php</code>.</li>
+<li>Upload the <code>zc_plugins/EuWithdrawalButton</code> folder from this package into your store's <code>zc_plugins</code> folder, so you have <code>zc_plugins/EuWithdrawalButton/v1.1.1/manifest.php</code>.</li>
 <li>In the admin, open <strong>Modules &gt; Plugin Manager</strong>, select <strong>EU Withdrawal Button</strong> and click <strong>Install</strong>.</li>
 <li>Set <strong>Store Time Zone</strong> under <strong>Configuration &gt; EU Withdrawal Button</strong> (for example <code>Europe/Berlin</code>). Hosting servers often run on UTC.</li>
 <li>Look at your storefront: the button is in the footer. Try the page once with a real order of your own.</li>
@@ -186,7 +186,18 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 <p>They follow the language's two-letter code, whatever your language folder is called. The rest of the wording is English until translated: copy <code>catalog/includes/languages/english/extra_definitions/lang.eu_withdrawal.php</code> (inside the plugin's folder) to the same place under your language's folder and translate the values. Leave out the two label lines to keep the directive's wording.</p>
 
 <h2 id="pro">EU Withdrawal Button Pro</h2>
-<p>A paid add-on is planned that turns withdrawals into a returns portal: customers tick the items and quantities, you issue an RMA number and a return label, the customer gets status emails as the return moves along, a deadline helper flags late statements for you, and the model withdrawal form can go out with every order confirmation. It will need this plugin installed. This plugin is complete on its own.</p>
+<p>A paid add-on, <strong>EU Withdrawal Button Pro</strong>, turns each withdrawal into a return you can follow:</p>
+<ul>
+<li>customers choose the items and quantities they're withdrawing from, with a reason for each;</li>
+<li>a Return panel on each withdrawal, with an RMA number, return instructions and a PDF return label, emailed to the customer;</li>
+<li>Return Received with an optional restock, and the refund recorded (or store credit as a gift certificate);</li>
+<li>a Track Your Return page the customer opens from every email;</li>
+<li>the EU model withdrawal form in every order confirmation email;</li>
+<li>deadline flags and Article 16 reminders;</li>
+<li>an optional returns portal for customers outside the EU;</li>
+<li>a report by month and by product.</li>
+</ul>
+<p>It needs this plugin, version 1.1.0 or later, installed. It's at <a href="https://myzencartzone.com/index.php?main_page=product_info&amp;products_id=41">myzencartzone.com</a>. This plugin is complete on its own.</p>
 
 <h2 id="customizing">Customizing</h2>
 <ul>
@@ -198,7 +209,7 @@ nav ol{columns:2;column-gap:2em;padding-left:1.4em}
 
 <h2 id="upgrading">Upgrading</h2>
 <p>Upload the new version's folder beside the old one and click <strong>Upgrade</strong> in Plugin Manager. Your settings and every withdrawal statement are kept. Then <strong>Clean Up</strong> removes the old version's folder.</p>
-<p>From 1.0.0 to 1.1.0, one setting is new: <em>Withdrawal Link in Order E-Mail?</em>, which arrives switched on.</p>
+<p>From 1.0.0 to 1.1.0, one setting is new: <em>Withdrawal Link in Order E-Mail?</em>, which arrives switched on. From 1.1.0 to 1.1.1, only this guide changes; there's nothing to set.</p>
 
 <h2 id="uninstalling">Uninstalling</h2>
 <p>Click <strong>Uninstall</strong> in Plugin Manager. With <em>Delete Withdrawal Records on Uninstall?</em> false (the default) every statement is kept, and a later install picks them up again. Remember the law still applies to your store without the button.</p>
